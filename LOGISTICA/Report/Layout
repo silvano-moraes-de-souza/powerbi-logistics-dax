@@ -1,0 +1,38 @@
+{
+  "version": "5.53",
+  "theme": "Dark",
+  "config": "{\"name\":\"PowerBI_Report\",\"settings\":{\"canvasBackground\":{\"image\":{\"name\":\"dash_log_background.png\",\"url\":\"RegisteredResources/dash_log_background.png\"},\"transparency\":0}}}",
+  "sections": [
+    {
+      "id": "LogisticsSummary",
+      "name": "ReportSection1",
+      "displayName": "Logística Dashboard",
+      "visualContainers": [
+        {
+          "x": 200, "y": 200, "width": 400, "height": 140,
+          "config": "{\"name\":\"CardFaturamento\",\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Medidas Logística.Faturamento Total\"}]},\"objects\":{\"labels\":[{\"color\":{\"solid\":{\"color\":\"#81ecff\"}}}]}}}"
+        },
+        {
+          "x": 620, "y": 200, "width": 400, "height": 140,
+          "config": "{\"name\":\"CardMargem\",\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Medidas Logística.Margem Percentual\"}]},\"objects\":{\"labels\":[{\"color\":{\"solid\":{\"color\":\"#b085ff\"}}}]}}}"
+        },
+        {
+          "x": 1040, "y": 200, "width": 400, "height": 140,
+          "config": "{\"name\":\"CardVolume\",\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Medidas Logística.Volume Total\"}]}}}"
+        },
+        {
+          "x": 1460, "y": 200, "width": 400, "height": 140,
+          "config": "{\"name\":\"CardLeadTime\",\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Medidas Logística.Lead Time Médio\"}]}}}"
+        },
+        {
+          "x": 200, "y": 360, "width": 820, "height": 450,
+          "config": "{\"name\":\"BarChartTransportadora\",\"singleVisual\":{\"visualType\":\"barChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Fato_Logistica.Transportadora\"}],\"Y\":[{\"queryRef\":\"Medidas Logística.Custo Frete Total\"}]},\"objects\":{\"dataPoint\":[{\"fill\":{\"solid\":{\"color\":\"#81ecff\"}}}]}}}"
+        },
+        {
+          "x": 1040, "y": 360, "width": 820, "height": 450,
+          "config": "{\"name\":\"LineChartFaturamento\",\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"Fato_Logistica.Data\"}],\"Y\":[{\"queryRef\":\"Medidas Logística.Faturamento Total\"}]},\"objects\":{\"dataPoint\":[{\"fill\":{\"solid\":{\"color\":\"#b085ff\"}}}]}}}"
+        }
+      ]
+    }
+  ]
+}

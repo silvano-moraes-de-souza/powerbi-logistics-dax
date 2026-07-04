@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "CardYTD",
+  "position": {
+    "x": 344,
+    "y": 270,
+    "z": 4,
+    "width": 280,
+    "height": 90,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "card",
+    "projections": {
+      "Values": [
+        {
+          "queryRef": "BASE LOGISTICA.Faturamento YTD"
+        }
+      ]
+    }
+  }
+}

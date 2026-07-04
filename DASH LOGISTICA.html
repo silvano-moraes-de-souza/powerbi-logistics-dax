@@ -1,0 +1,1440 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Dashboard de Logística</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              surface: "#1a1c24",
+              "surface-dim": "#14161d",
+              "surface-container": "#22252e",
+              "surface-container-high": "#2b2e3a",
+              primary: "#81ecff",
+              secondary: "#b085ff",
+              tertiary: "#69f6b8",
+              "on-surface": "#f0f0fb",
+              "on-surface-variant": "#94a3b8",
+              outline: "#464751",
+            },
+            fontFamily: {
+              headline: ["Plus Jakarta Sans"],
+              body: ["Plus Jakarta Sans"],
+              label: ["Plus Jakarta Sans"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "0.75rem",
+              xl: "1rem",
+              "2xl": "1.5rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: #14161d;
+        color: #f0f0fb;
+      }
+      .neon-glow-primary {
+        box-shadow: 0 0 20px rgba(129, 236, 255, 0.15);
+      }
+      .neon-card {
+        background: linear-gradient(
+          145deg,
+          rgba(34, 37, 46, 0.8),
+          rgba(26, 28, 36, 0.9)
+        );
+        border: 1px solid rgba(129, 236, 255, 0.1);
+        backdrop-filter: blur(20px);
+        transition: all 0.3s ease;
+      }
+      .neon-card:hover {
+        border-color: rgba(129, 236, 255, 0.3);
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.4),
+          0 0 15px rgba(129, 236, 255, 0.05);
+      }
+      .map-glow {
+        filter: drop-shadow(0 0 25px rgba(129, 236, 255, 0.3));
+      }
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #464751;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #81ecff;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const tooltip = document.getElementById("stateTooltip");
+        const statePaths = document.querySelectorAll(".state-path");
+
+        statePaths.forEach((path) => {
+          path.addEventListener("mouseenter", function () {
+            const stateName = this.getAttribute("data-state");
+            const stateValue = this.getAttribute("data-value");
+            const stateVolume = this.getAttribute("data-volume");
+            const stateTrips = this.getAttribute("data-trips");
+
+            document.getElementById("stateName").textContent = stateName;
+            document.getElementById("stateValue").textContent = stateValue;
+            document.getElementById("stateVolume").textContent = stateVolume;
+            document.getElementById("stateTrips").textContent = stateTrips;
+
+            tooltip.classList.remove("hidden");
+          });
+
+          path.addEventListener("mouseleave", function () {
+            tooltip.classList.add("hidden");
+          });
+        });
+      });
+    </script>
+  </head>
+  <body class="overflow-hidden flex flex-col h-screen">
+    <!-- TopNavBar -->
+    <header
+      class="bg-[#171923]/80 backdrop-blur-xl sticky top-0 z-50 border-b border-[#464751]/15 shadow-[0px_20px_40px_rgba(0,0,0,0.4)] px-6 py-3 flex justify-between items-center w-full"
+    >
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-3 group cursor-pointer">
+          <div
+            class="w-10 h-10 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center shadow-lg neon-glow-primary"
+          >
+            <span
+              class="material-symbols-outlined text-surface text-2xl"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >local_shipping</span
+            >
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xl font-extrabold tracking-tighter text-[#f0f0fb]"
+              >DASH DE LOGÍSTICA</span
+            >
+            <span
+              class="text-[9px] text-on-surface-variant tracking-[0.2em] font-bold uppercase"
+              >Painel de Controle</span
+            >
+          </div>
+        </div>
+        <nav class="hidden lg:flex items-center gap-6 ml-4">
+          <div class="h-4 w-[1px] bg-outline/30"></div>
+          <div
+            class="flex items-center gap-1 cursor-pointer text-[#f0f0fb]/70 hover:text-[#f0f0fb] transition-all text-sm font-bold tracking-tight px-3 py-1 hover:bg-[#282c38] rounded-lg"
+          >
+            <span>Mês</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </div>
+          <div
+            class="flex items-center gap-1 cursor-pointer text-[#f0f0fb]/70 hover:text-[#f0f0fb] transition-all text-sm font-bold tracking-tight px-3 py-1 hover:bg-[#282c38] rounded-lg"
+          >
+            <span>Ano</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </div>
+          <div
+            class="flex items-center gap-1 cursor-pointer text-[#f0f0fb]/70 hover:text-[#f0f0fb] transition-all text-sm font-bold tracking-tight px-3 py-1 hover:bg-[#282c38] rounded-lg"
+          >
+            <span>Cliente</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </div>
+          <div
+            class="flex items-center gap-1 cursor-pointer text-[#f0f0fb]/70 hover:text-[#f0f0fb] transition-all text-sm font-bold tracking-tight px-3 py-1 hover:bg-[#282c38] rounded-lg"
+          >
+            <span>Transportadora</span>
+            <span class="material-symbols-outlined text-sm">expand_more</span>
+          </div>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 pl-2 group cursor-pointer">
+          <div class="text-right hidden sm:block">
+            <p class="text-xs font-bold text-on-surface">Bem-vindo</p>
+            <p
+              class="text-[9px] font-bold text-primary uppercase tracking-tighter"
+            >
+              Gerenciador
+            </p>
+          </div>
+          <div
+            class="w-9 h-9 rounded-full overflow-hidden border border-primary/40 ring-2 ring-primary/10 shadow-lg"
+          >
+            <img
+              alt="Avatar do Usuário"
+              class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcusSb9wFEarJrkDjyfofee3HyvXhWtor025OerKELCyay81Qn6UNe7yetbfA1UwSmCcTUumuySqJhfskf0A6C_0D_qOxcWZ-kuJ5cpG8wMtJkXGs40rCr7Bk4iuhMUWgMugP1BoWq0rOCcV6TsqsAPoP0ozmjtxRgwrI5TfybP1TKOcm2JhOVfsao7FASzVtUD5nt_zlpue26aPGoDg4QEsJbflpLlHXAuXfG17lK02zNCOBv1HAmfZOFa3K-pw5SowEjrLxBJlpa"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-surface-dim">
+      <div class="max-w-[1600px] mx-auto space-y-6">
+        <!-- Key Metrics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            class="neon-card rounded-2xl p-6 flex items-center justify-between overflow-hidden relative group"
+          >
+            <div
+              class="absolute -right-4 -top-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"
+            ></div>
+            <div class="flex items-center gap-5">
+              <div
+                class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20"
+              >
+                <span class="material-symbols-outlined text-primary text-3xl"
+                  >inventory_2</span
+                >
+              </div>
+              <div>
+                <p
+                  class="text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Total de Volumes
+                </p>
+                <h2
+                  class="text-4xl font-extrabold text-on-surface tracking-tighter"
+                >
+                  58,450
+                </h2>
+                <div class="flex items-center gap-1 mt-1">
+                  <span
+                    class="material-symbols-outlined text-[14px] text-tertiary"
+                    >trending_up</span
+                  >
+                  <span class="text-[11px] font-bold text-tertiary"
+                    >+12.4% vs mês anterior</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="neon-card rounded-2xl p-6 flex items-center justify-between overflow-hidden relative group"
+          >
+            <div
+              class="absolute -right-4 -top-4 w-32 h-32 bg-secondary/5 rounded-full blur-3xl group-hover:bg-secondary/10 transition-all"
+            ></div>
+            <div class="flex items-center gap-5">
+              <div
+                class="w-14 h-14 bg-secondary/10 rounded-xl flex items-center justify-center border border-secondary/20"
+              >
+                <span class="material-symbols-outlined text-secondary text-3xl"
+                  >payments</span
+                >
+              </div>
+              <div>
+                <p
+                  class="text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Total Faturado
+                </p>
+                <h2
+                  class="text-4xl font-extrabold text-on-surface tracking-tighter"
+                >
+                  R$ 2,548,900
+                </h2>
+                <div class="flex items-center gap-1 mt-1">
+                  <span
+                    class="material-symbols-outlined text-[14px] text-tertiary"
+                    >trending_up</span
+                  >
+                  <span class="text-[11px] font-bold text-tertiary"
+                    >Novo recorde diário</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="neon-card rounded-2xl p-6 flex items-center justify-between overflow-hidden relative group"
+          >
+            <div
+              class="absolute -right-4 -top-4 w-32 h-32 bg-tertiary/5 rounded-full blur-3xl group-hover:bg-tertiary/10 transition-all"
+            ></div>
+            <div class="flex items-center gap-5">
+              <div
+                class="w-14 h-14 bg-tertiary/10 rounded-xl flex items-center justify-center border border-tertiary/20"
+              >
+                <span class="material-symbols-outlined text-tertiary text-3xl"
+                  >local_shipping</span
+                >
+              </div>
+              <div>
+                <p
+                  class="text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Total Transportado
+                </p>
+                <h2
+                  class="text-4xl font-extrabold text-on-surface tracking-tighter"
+                >
+                  1,843
+                </h2>
+                <div class="flex items-center gap-1 mt-1">
+                  <span
+                    class="material-symbols-outlined text-[14px] text-tertiary"
+                    >trending_up</span
+                  >
+                  <span class="text-[11px] font-bold text-tertiary"
+                    >+8.2% em eficiência</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-12 gap-6">
+          <!-- Prominent Brazil Map SVG -->
+          <div
+            class="col-span-12 lg:col-span-8 neon-card rounded-2xl p-8 min-h-[500px] relative overflow-hidden flex flex-col"
+          >
+            <div class="flex justify-between items-start mb-10 z-10">
+              <div>
+                <h3
+                  class="text-xl font-extrabold text-on-surface flex items-center gap-2"
+                >
+                  <span class="w-2 h-6 bg-primary rounded-full"></span>
+                  Rede de Logística Geográfica
+                </h3>
+                <p class="text-sm text-on-surface-variant mt-1">
+                  Distribuição em tempo real por estado brasileiro
+                </p>
+              </div>
+              <div
+                class="flex items-center gap-2 bg-primary/10 border border-primary/30 px-3 py-1.5 rounded-full animate-pulse"
+              >
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span
+                  class="text-[10px] font-black text-primary uppercase tracking-widest"
+                  >Sincronizando</span
+                >
+              </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center relative">
+              <!-- Large Map SVG - Brasil por Estados -->
+              <div class="relative w-full max-w-lg map-glow">
+                <svg
+                  class="w-full h-auto text-primary/10 fill-current"
+                  viewbox="0 0 500 500"
+                >
+                  <!-- Estados do Brasil (Simulado) -->
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- São Paulo -->
+                    <path
+                      class="hover:fill-primary/40 hover:text-primary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M250,180 L300,200 L310,260 L270,280 L240,250 Z"
+                      data-state="São Paulo"
+                      data-value="R$ 756,200"
+                      data-volume="12450"
+                      data-trips="342"
+                    ></path>
+                    <circle
+                      class="fill-primary animate-pulse"
+                      cx="275"
+                      cy="230"
+                      r="4"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Minas Gerais -->
+                    <path
+                      class="hover:fill-secondary/40 hover:text-secondary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M310,200 L360,210 L380,290 L320,300 L310,260 Z"
+                      data-state="Minas Gerais"
+                      data-value="R$ 524,100"
+                      data-volume="8920"
+                      data-trips="251"
+                    ></path>
+                    <circle
+                      class="fill-secondary animate-pulse"
+                      cx="340"
+                      cy="250"
+                      r="3"
+                      style="animation-delay: 0.5s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Rio de Janeiro -->
+                    <path
+                      class="hover:fill-tertiary/40 hover:text-tertiary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M340,150 L380,160 L385,210 L350,200 Z"
+                      data-state="Rio de Janeiro"
+                      data-value="R$ 385,600"
+                      data-volume="6200"
+                      data-trips="178"
+                    ></path>
+                    <circle
+                      class="fill-tertiary animate-pulse"
+                      cx="360"
+                      cy="175"
+                      r="3"
+                      style="animation-delay: 1s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Bahia -->
+                    <path
+                      class="hover:fill-primary/40 hover:text-primary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M380,260 L420,270 L430,350 L390,360 L380,290 Z"
+                      data-state="Bahia"
+                      data-value="R$ 298,400"
+                      data-volume="4850"
+                      data-trips="142"
+                    ></path>
+                    <circle
+                      class="fill-primary animate-pulse"
+                      cx="405"
+                      cy="310"
+                      r="3"
+                      style="animation-delay: 1.5s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Paraná -->
+                    <path
+                      class="hover:fill-secondary/40 hover:text-secondary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M260,300 L310,310 L315,370 L270,375 Z"
+                      data-state="Paraná"
+                      data-value="R$ 245,800"
+                      data-volume="3920"
+                      data-trips="115"
+                    ></path>
+                    <circle
+                      class="fill-secondary animate-pulse"
+                      cx="285"
+                      cy="340"
+                      r="3"
+                      style="animation-delay: 2s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Santa Catarina -->
+                    <path
+                      class="hover:fill-tertiary/40 hover:text-tertiary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M280,370 L310,375 L315,410 L285,415 Z"
+                      data-state="Santa Catarina"
+                      data-value="R$ 156,200"
+                      data-volume="2340"
+                      data-trips="68"
+                    ></path>
+                    <circle
+                      class="fill-tertiary animate-pulse"
+                      cx="295"
+                      cy="390"
+                      r="2"
+                      style="animation-delay: 2.5s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Rio Grande do Sul -->
+                    <path
+                      class="hover:fill-primary/40 hover:text-primary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M250,400 L290,410 L295,450 L255,460 Z"
+                      data-state="Rio Grande do Sul"
+                      data-value="R$ 189,700"
+                      data-volume="2890"
+                      data-trips="84"
+                    ></path>
+                    <circle
+                      class="fill-primary animate-pulse"
+                      cx="270"
+                      cy="430"
+                      r="2"
+                      style="animation-delay: 3s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Pernambuco -->
+                    <path
+                      class="hover:fill-secondary/40 hover:text-secondary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M400,240 L440,250 L445,320 L405,310 Z"
+                      data-state="Pernambuco"
+                      data-value="R$ 145,300"
+                      data-volume="2150"
+                      data-trips="62"
+                    ></path>
+                    <circle
+                      class="fill-secondary animate-pulse"
+                      cx="420"
+                      cy="280"
+                      r="2"
+                      style="animation-delay: 3.5s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- Ceará -->
+                    <path
+                      class="hover:fill-tertiary/40 hover:text-tertiary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M390,150 L440,155 L445,220 L400,210 Z"
+                      data-state="Ceará"
+                      data-value="R$ 128,900"
+                      data-volume="1980"
+                      data-trips="57"
+                    ></path>
+                    <circle
+                      class="fill-tertiary animate-pulse"
+                      cx="415"
+                      cy="180"
+                      r="2"
+                      style="animation-delay: 4s"
+                    ></circle>
+                  </g>
+
+                  <g
+                    class="state-group hover:opacity-100 opacity-80 transition-opacity"
+                  >
+                    <!-- São João Estado Teste -->
+                    <path
+                      class="hover:fill-primary/40 hover:text-primary transition-all pointer-events-auto cursor-pointer state-path"
+                      d="M320,80 L360,85 L365,130 L330,125 Z"
+                      data-state="Distrito Federal"
+                      data-value="R$ 98,500"
+                      data-volume="1250"
+                      data-trips="38"
+                    ></path>
+                    <circle
+                      class="fill-primary animate-pulse"
+                      cx="340"
+                      cy="105"
+                      r="2"
+                      style="animation-delay: 4.5s"
+                    ></circle>
+                  </g>
+                </svg>
+                <!-- Tooltip overlay -->
+                <div
+                  id="stateTooltip"
+                  class="absolute top-[60%] right-[10%] neon-card p-4 rounded-xl border-primary/40 shadow-2xl backdrop-blur-md min-w-[200px] hidden"
+                >
+                  <p
+                    class="text-[10px] font-black text-primary uppercase tracking-tighter mb-1"
+                  >
+                    Informações do Estado
+                  </p>
+                  <h4
+                    id="stateName"
+                    class="text-lg font-extrabold text-on-surface"
+                  >
+                    São Paulo
+                  </h4>
+                  <div class="mt-3 space-y-2">
+                    <div
+                      class="flex justify-between items-end border-b border-outline/20 pb-1"
+                    >
+                      <span
+                        class="text-[10px] text-on-surface-variant font-bold uppercase"
+                        >Faturado</span
+                      >
+                      <span
+                        id="stateValue"
+                        class="text-sm font-extrabold text-on-surface"
+                        >R$ 756,200</span
+                      >
+                    </div>
+                    <div
+                      class="flex justify-between items-end border-b border-outline/20 pb-1"
+                    >
+                      <span
+                        class="text-[10px] text-on-surface-variant font-bold uppercase"
+                        >Volume</span
+                      >
+                      <span
+                        id="stateVolume"
+                        class="text-sm font-extrabold text-on-surface"
+                        >12,450</span
+                      >
+                    </div>
+                    <div
+                      class="flex justify-between items-end border-b border-outline/20 pb-1"
+                    >
+                      <span
+                        class="text-[10px] text-on-surface-variant font-bold uppercase"
+                        >Viagens</span
+                      >
+                      <span
+                        id="stateTrips"
+                        class="text-sm font-extrabold text-on-surface"
+                        >342</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Top 10 Column -->
+          <div class="col-span-12 lg:col-span-4 space-y-6 flex flex-col">
+            <!-- Top 10 Faturado -->
+            <div class="neon-card rounded-2xl p-6 flex-1 flex flex-col">
+              <h3 class="text-base font-extrabold text-on-surface mb-1">
+                Top 10 Faturado
+              </h3>
+              <p class="text-xs text-on-surface-variant mb-4">
+                Maiores rentabilidades
+              </p>
+              <div class="space-y-3 flex-1 overflow-y-auto">
+                <!-- Item 1 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">1.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >FastLog</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">R$ 942k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-full shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 2 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">2.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >TechLogistics</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary"
+                      >R$ 850k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[90%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 3 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">3.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Global Trade Co</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary"
+                      >R$ 720k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[76%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 4 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">4.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Varejo Brasil</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">R$ 610k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[65%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 5 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">5.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Nexus Corp</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary"
+                      >R$ 540k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[57%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 6 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">6.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Commerce Hub</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary"
+                      >R$ 475k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[50%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 7 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">7.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Supply Dynamics</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">R$ 420k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[45%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 8 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">8.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Logistics Plus</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary"
+                      >R$ 380k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[40%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 9 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">9.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Distribution Co</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary"
+                      >R$ 310k</span
+                    >
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[33%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 10 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">10.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Metro Cargo</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">R$ 265k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[28%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Top 10 Volumes -->
+            <div class="neon-card rounded-2xl p-6 flex-1 flex flex-col">
+              <h3 class="text-base font-extrabold text-on-surface mb-1">
+                Top 10 Volumes
+              </h3>
+              <p class="text-xs text-on-surface-variant mb-4">
+                Maiores quantidades movimentadas
+              </p>
+              <div class="space-y-3 flex-1 overflow-y-auto">
+                <!-- Item 1 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">1.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Atlas Trans</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary">42.5k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-full shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 2 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">2.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Prime Cargo</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">38.2k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[90%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 3 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">3.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Swift Log</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary">31.1k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[73%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 4 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">4.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Delta Fleet</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary">28.9k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[68%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 5 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">5.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Omni Road</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">24.5k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[58%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 6 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">6.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Express Move</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary">22.3k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[52%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 7 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">7.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Velocity Sys</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary">18.7k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[44%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 8 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-primary">8.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Route Master</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-primary">16.4k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-primary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-primary to-primary/60 w-[39%] shadow-[0_0_10px_rgba(129,236,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 9 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-tertiary">9.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Urban Freight</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-tertiary">13.2k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[31%] shadow-[0_0_10px_rgba(105,246,184,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+                <!-- Item 10 -->
+                <div
+                  class="hover:bg-surface-container/50 transition-all rounded-lg p-2"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-secondary">10.</span>
+                      <span class="text-xs font-bold text-on-surface"
+                        >Central Hub</span
+                      >
+                    </div>
+                    <span class="text-xs font-black text-secondary">9.8k</span>
+                  </div>
+                  <div
+                    class="h-3 bg-surface-dim rounded-full overflow-hidden border border-secondary/20"
+                  >
+                    <div
+                      class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[23%] shadow-[0_0_10px_rgba(176,133,255,0.4)]"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Custo por Transportadora -->
+          <div class="col-span-12 neon-card rounded-2xl p-8">
+            <div
+              class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
+            >
+              <div>
+                <h3 class="text-xl font-extrabold text-on-surface">
+                  Custo por Transportadora
+                </h3>
+                <p class="text-sm text-on-surface-variant">
+                  Análise comparativa de custos por provedor logístico
+                </p>
+              </div>
+              <div class="flex gap-3">
+                <button
+                  class="px-5 py-2 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 rounded-xl text-xs font-bold transition-all flex items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-sm"
+                    >download</span
+                  >
+                  Baixar Relatório
+                </button>
+                <button
+                  class="px-5 py-2 bg-surface-container-high border border-outline/20 rounded-xl text-xs font-bold text-on-surface hover:bg-[#343846] transition-all"
+                >
+                  Atualizar Dados
+                </button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead>
+                  <tr
+                    class="text-on-surface-variant font-black text-[10px] uppercase tracking-widest border-b border-outline/20"
+                  >
+                    <th class="pb-4 px-4">Transportadora</th>
+                    <th class="pb-4 px-5 text-right">Custo (R$)</th>
+                    <th class="pb-4 px-5 text-right">Volume</th>
+                    <th class="pb-4 px-6 text-right">Faturado (R$)</th>
+                    <th class="pb-4 px-8">Porcentagem</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline/10">
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">FastLog</td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 158.4k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">14.2k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 756.2k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-primary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-primary to-primary/60 w-full shadow-[0_0_5px_rgba(129,236,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-primary whitespace-nowrap"
+                          >24.5%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      TransGlobal
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 124.3k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">12.8k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 624.5k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-secondary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[78%] shadow-[0_0_5px_rgba(176,133,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-secondary whitespace-nowrap"
+                          >19.2%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Swift Cargo
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 98.6k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">10.5k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 520.3k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[62%] shadow-[0_0_5px_rgba(105,246,184,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-tertiary whitespace-nowrap"
+                          >15.2%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Loggi Cargo
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 79.3k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">8.9k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 445.8k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-primary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-primary to-primary/60 w-[50%] shadow-[0_0_5px_rgba(129,236,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-primary whitespace-nowrap"
+                          >12.2%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      XP Logística
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 64.2k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">7.2k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 365.2k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-secondary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[40%] shadow-[0_0_5px_rgba(176,133,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-secondary whitespace-nowrap"
+                          >9.9%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Sedex Express
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 52.1k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">5.8k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 289.6k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[33%] shadow-[0_0_5px_rgba(105,246,184,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-tertiary whitespace-nowrap"
+                          >8.1%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">JadLog</td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 43.9k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">4.9k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 234.5k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-primary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-primary to-primary/60 w-[28%] shadow-[0_0_5px_rgba(129,236,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-primary whitespace-nowrap"
+                          >6.8%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Total Express
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 35.6k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">4.1k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 189.2k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-secondary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[22%] shadow-[0_0_5px_rgba(176,133,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-secondary whitespace-nowrap"
+                          >5.5%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Intra Cargo
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 28.9k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">3.3k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 156.7k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-tertiary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-tertiary to-tertiary/60 w-[18%] shadow-[0_0_5px_rgba(105,246,184,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-tertiary whitespace-nowrap"
+                          >4.5%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Braspress
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 23.7k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">2.7k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 128.9k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-primary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-primary to-primary/60 w-[15%] shadow-[0_0_5px_rgba(129,236,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-primary whitespace-nowrap"
+                          >3.7%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-primary/5 transition-colors group cursor-pointer"
+                  >
+                    <td class="py-5 px-4 font-bold text-on-surface">
+                      Outras Transportadoras
+                    </td>
+                    <td class="py-5 px-5 text-right font-black text-on-surface">
+                      R$ 112.5k
+                    </td>
+                    <td class="py-5 px-5 text-right text-on-surface">14.6k</td>
+                    <td class="py-5 px-6 text-right font-black text-on-surface">
+                      R$ 745.1k
+                    </td>
+                    <td class="py-5 px-8">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="flex-1 h-2 bg-surface-dim rounded-full overflow-hidden border border-secondary/20 min-w-[80px]"
+                        >
+                          <div
+                            class="h-full bg-gradient-to-r from-secondary to-secondary/60 w-[71%] shadow-[0_0_5px_rgba(176,133,255,0.3)]"
+                          ></div>
+                        </div>
+                        <span
+                          class="text-xs font-black text-secondary whitespace-nowrap"
+                          >17.4%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

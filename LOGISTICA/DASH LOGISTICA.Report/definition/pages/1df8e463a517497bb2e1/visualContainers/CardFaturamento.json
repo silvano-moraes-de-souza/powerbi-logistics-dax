@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "CardFaturamento",
+  "position": {
+    "x": 450,
+    "y": 120,
+    "z": 1,
+    "width": 380,
+    "height": 130,
+    "tabOrder": 1
+  },
+  "visual": {
+    "visualType": "card",
+    "projections": {
+      "Values": [
+        {
+          "queryRef": "BASE LOGISTICA.Faturamento Total"
+        }
+      ]
+    }
+  }
+}

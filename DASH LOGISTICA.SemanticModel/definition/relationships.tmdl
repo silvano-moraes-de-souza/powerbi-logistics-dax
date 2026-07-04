@@ -1,0 +1,5 @@
+relationship 9a2a4e44-a8e4-4008-9a67-e1baa34cd279
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'BASE LOGISTICA'.Data
+	toColumn: LocalDateTable_074b387c-a6d8-4e7b-94d6-f790ce0bb7e5.Date
+

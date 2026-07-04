@@ -1,0 +1,117 @@
+table 'BASE LOGISTICA'
+	lineageTag: 60acef39-4a10-45bf-a00c-64ccb92f2233
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 9987f2fe-13b8-467e-bf31-8baf44b8147a
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 79ef57b4-2bf3-4a3f-ba11-67781cf92a4e
+		summarizeBy: none
+		sourceColumn: Data
+
+		variation Variation
+			isDefault
+			relationship: 9a2a4e44-a8e4-4008-9a67-e1baa34cd279
+			defaultHierarchy: LocalDateTable_074b387c-a6d8-4e7b-94d6-f790ce0bb7e5.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Transportadora
+		dataType: string
+		lineageTag: 5ef0f7e7-7ad0-4f8b-a15b-7bf2f62bc38f
+		summarizeBy: none
+		sourceColumn: Transportadora
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cliente
+		dataType: string
+		lineageTag: 63fb9528-7c55-4a06-a5ef-e5fad3077c3c
+		summarizeBy: none
+		sourceColumn: Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Origem
+		dataType: string
+		lineageTag: 44c3a57a-acb7-4769-8791-8d70a90a3b42
+		summarizeBy: none
+		sourceColumn: Estado_Origem
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Destino
+		dataType: string
+		lineageTag: ba99bc16-4183-4467-b520-020181c80747
+		summarizeBy: none
+		sourceColumn: Estado_Destino
+
+		annotation SummarizationSetBy = Automatic
+
+	column Volume
+		dataType: int64
+		formatString: 0
+		lineageTag: d4d3f083-aa31-4188-bcba-e58d5be76b5a
+		summarizeBy: sum
+		sourceColumn: Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Valor Faturamento'
+		dataType: int64
+		formatString: 0
+		lineageTag: 23367e5c-321b-4169-b445-324b7d27500d
+		summarizeBy: sum
+		sourceColumn: Valor Faturamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Custo de Frete'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7176140f-1642-4f09-88f4-3b5ad7587f0c
+		summarizeBy: sum
+		sourceColumn: Custo de Frete
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d0c9373-b4ad-4d24-b531-e99d0cc50ce1
+		summarizeBy: sum
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: e68d6f96-9e96-46b7-941b-a859fbfa43d0
+		summarizeBy: sum
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'BASE LOGISTICA' = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("D:\PROJETOS\ANTIGRAVITY\POWER BI\BASE LOGISTICA.csv"),[Delimiter=";", Columns=11, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"ID", Int64.Type}, {"Data", type date}, {"Transportadora", type text}, {"Cliente", type text}, {"Estado_Origem", type text}, {"Estado_Destino", type text}, {"Volume", Int64.Type}, {"Valor Faturamento", Int64.Type}, {"Custo de Frete", Int64.Type}, {"Mes", Int64.Type}, {"Ano", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

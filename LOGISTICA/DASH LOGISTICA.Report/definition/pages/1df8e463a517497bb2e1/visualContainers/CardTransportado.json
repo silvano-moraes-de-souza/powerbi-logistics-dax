@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "CardTransportado",
+  "position": {
+    "x": 868,
+    "y": 120,
+    "z": 2,
+    "width": 380,
+    "height": 130,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "card",
+    "projections": {
+      "Values": [
+        {
+          "queryRef": "BASE LOGISTICA.KPI Rotas"
+        }
+      ]
+    }
+  }
+}

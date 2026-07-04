@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "CardTicket",
+  "position": {
+    "x": 968,
+    "y": 270,
+    "z": 6,
+    "width": 280,
+    "height": 90,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "card",
+    "projections": {
+      "Values": [
+        {
+          "queryRef": "BASE LOGISTICA.Ticket Médio"
+        }
+      ]
+    }
+  }
+}

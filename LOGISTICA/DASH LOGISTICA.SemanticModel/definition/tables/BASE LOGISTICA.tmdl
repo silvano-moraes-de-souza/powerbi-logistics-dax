@@ -1,0 +1,136 @@
+table 'BASE LOGISTICA'
+	lineageTag: be250763-8334-406d-b7b4-6c4c3e92c903
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: a60dab4f-e7e1-4152-b1a8-3ff54f9f87b4
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 96b0f0ec-4d22-4922-b9c6-a297c5015fca
+		summarizeBy: none
+		sourceColumn: Data
+
+		variation Variation
+			isDefault
+			relationship: 5a6360b1-2471-48e8-8142-93eed7d9e5d0
+			defaultHierarchy: LocalDateTable_76283e49-575e-49fa-b1e2-8eba0be0e742.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Transportadora
+		dataType: string
+		lineageTag: 32c1e3ff-acf6-4423-8d6d-c16ce1f0b60c
+		summarizeBy: none
+		sourceColumn: Transportadora
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cliente
+		dataType: string
+		lineageTag: 936d5ffe-db13-48a7-9aba-0e797ac661a9
+		summarizeBy: none
+		sourceColumn: Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Origem
+		dataType: string
+		lineageTag: f2d48e54-0dae-4f5c-9060-1365ea71ebfd
+		summarizeBy: none
+		sourceColumn: Estado_Origem
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado_Destino
+		dataType: string
+		lineageTag: 7bf2af63-0eea-45b6-8100-c2cf46fc06f5
+		summarizeBy: none
+		sourceColumn: Estado_Destino
+
+		annotation SummarizationSetBy = Automatic
+
+	column Volume
+		dataType: int64
+		formatString: 0
+		lineageTag: 368f3b2f-31e1-480e-9dbd-a764ea4c8bdc
+		summarizeBy: sum
+		sourceColumn: Volume
+
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Faturamento por Viagem' = DIVIDE([Faturamento Total], COUNTROWS('BASE LOGISTICA'), 0)
+		formatString: "R$ "#,0
+		lineageTag: aa10a00c-64cc-b92f-2234-a00c64ccb92f
+
+	measure 'Faturamento YTD' = TOTALYTD([Faturamento Total], 'BASE LOGISTICA'[Data])
+		formatString: "R$ "#,0
+		lineageTag: f8a6245d-edb9-4bd4-a00c-64ccb92f2235
+
+	measure 'Faturamento YoY %' = 
+			VAR fat_atual = [Faturamento Total]
+			VAR fat_ano_ant = CALCULATE([Faturamento Total], SAMEPERIODLASTYEAR('BASE LOGISTICA'[Data]))
+			RETURN DIVIDE(fat_atual - fat_ano_ant, fat_ano_ant, 0)
+		formatString: 0.0%
+		lineageTag: 81ecffb1-a00c-64cc-b92f-2234-a00c64ccb92f
+
+	measure 'Ticket Médio' = DIVIDE([Faturamento Total], [Volume Total], 0)
+		formatString: "R$ "#,0
+		lineageTag: bb10a00c-64cc-b92f-2234-a00c64ccb92f
+
+	column 'Valor Faturamento'
+		dataType: int64
+		formatString: 0
+		lineageTag: df0c5fc3-f8c4-4daf-ae63-baa19f2ab33a
+		summarizeBy: sum
+		sourceColumn: Valor Faturamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Custo de Frete'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8395f5db-82d3-4d95-b330-3dac1c92a039
+		summarizeBy: sum
+		sourceColumn: Custo de Frete
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mes
+		dataType: int64
+		formatString: 0
+		lineageTag: 2612477f-2088-4b66-aa5a-bc912f62cbd2
+		summarizeBy: sum
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: fbb7f8c1-a639-4a56-ba9f-8c8a6a9eddb0
+		summarizeBy: sum
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'BASE LOGISTICA' = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("D:\PROJETOS\ANTIGRAVITY\POWER BI\BASE LOGISTICA.csv"),[Delimiter=";", Columns=11, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"ID", Int64.Type}, {"Data", type date}, {"Transportadora", type text}, {"Cliente", type text}, {"Estado_Origem", type text}, {"Estado_Destino", type text}, {"Volume", Int64.Type}, {"Valor Faturamento", Int64.Type}, {"Custo de Frete", Int64.Type}, {"Mes", Int64.Type}, {"Ano", Int64.Type}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

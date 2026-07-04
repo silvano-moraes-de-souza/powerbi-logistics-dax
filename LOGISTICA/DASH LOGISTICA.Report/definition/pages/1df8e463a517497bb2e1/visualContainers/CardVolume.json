@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "CardVolume",
+  "position": {
+    "x": 32,
+    "y": 120,
+    "z": 0,
+    "width": 380,
+    "height": 130,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "card",
+    "projections": {
+      "Values": [
+        {
+          "queryRef": "BASE LOGISTICA.Volume Total"
+        }
+      ]
+    }
+  }
+}

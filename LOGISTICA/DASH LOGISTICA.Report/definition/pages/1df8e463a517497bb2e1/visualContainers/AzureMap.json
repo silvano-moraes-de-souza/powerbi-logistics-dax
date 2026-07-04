@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visual-container/1.0.0/schema.json",
+  "name": "AzureMap",
+  "position": {
+    "x": 32,
+    "y": 380,
+    "z": 7,
+    "width": 800,
+    "height": 310,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "azureMapVisual",
+    "projections": {
+      "Location": [
+        {
+          "queryRef": "BASE LOGISTICA.Estado_Destino"
+        }
+      ],
+      "BubbleSize": [
+        {
+          "queryRef": "BASE LOGISTICA.Volume Total"
+        }
+      ]
+    }
+  }
+}
