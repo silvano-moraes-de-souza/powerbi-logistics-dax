@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="Logistics Dashboard in Power BI">
+<rect width="1280" height="320" fill="#0f1115"/>
+<rect x="64" y="64" width="6" height="192" rx="3" fill="#3987e5"/>
+<text x="96" y="158" fill="#f5f5f3" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="52" font-weight="700">Logistics Dashboard in Power BI</text>
+<text x="96" y="202" fill="#a3a29c" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="22">Freight revenue, margin and time intelligence in DAX, versioned as PBIP text</text>
+<rect x="96" y="226" width="96" height="32" rx="16" fill="#1d2027"/>
+<text x="144.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">Power BI</text>
+<rect x="202" y="226" width="51" height="32" rx="16" fill="#1d2027"/>
+<text x="227.5" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">DAX</text>
+<rect x="263" y="226" width="123" height="32" rx="16" fill="#1d2027"/>
+<text x="324.5" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">Power Query</text>
+<rect x="396" y="226" width="60" height="32" rx="16" fill="#1d2027"/>
+<text x="426.0" y="247" fill="#f5f5f3" font-family="ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace" font-size="14" text-anchor="middle">PBIP</text>
+</svg>

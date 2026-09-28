@@ -1,330 +1,67 @@
-# 📊 Power BI Logistics Dashboard — DAX & Data Modeling
+<p align="center">
+  <img src="docs/banner.svg" alt="Logistics Dashboard in Power BI" width="100%">
+</p>
 
-[![Power BI](https://img.shields.io/badge/Power%20BI-Desktop-yellow?style=flat&logo=microsoft-power-bi)](https://powerbi.microsoft.com/)
-[![DAX](https://img.shields.io/badge/DAX-Advanced-orange?style=flat)](https://docs.microsoft.com/en-us/dax/)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE)
+<p align="center">
+  <img src="https://img.shields.io/badge/Power%20BI-Desktop-f2c811?logo=powerbi&logoColor=black" alt="Power BI">
+  <img src="https://img.shields.io/badge/DAX-time%20intelligence-e97627" alt="DAX">
+  <img src="https://img.shields.io/badge/PBIP-git%20friendly-2a78d6" alt="PBIP">
+</p>
 
-> **Dashboard de Logística completo com dados reais de fretes, rotas e KPIs operacionais**
->
-> *Modelagem dimensional, DAX avançado e visualização estratégica para tomada de decisão.*
+> An executive logistics dashboard: freight revenue, cost, margin, volume and year-to-date figures by carrier, with a map of flows between states. The report is saved in the PBIP text format, so every measure and visual is readable and diffable in git.
 
----
+## What is on the dashboard
 
-## 🌟 Overview
+| Visual | Content |
+|---|---|
+| KPI cards | Revenue, margin, average ticket, volume transported, revenue YTD, revenue YoY % |
+| Map | Origin and destination states (Azure Maps) |
+| Carrier chart | Comparison between carriers |
+| Monthly chart | Trend over the months |
 
-Este projeto demonstra **domínio técnico em Power BI** aplicado a um cenário real de logística:
-
-- **📦 Modelagem de Dados**: Star schema com tabela fato (logística) e dimensões (tempo, transportadoras, clientes)
-- **🧮 DAX Avançado**: Medidas de faturamento, custos, margens, KPIs de lead time e ocupação de frota
-- **📊 Visualização**: Dashboard executivo com mapas, cards de KPI, gráficos de transporte e séries temporais
-- **🎨 Design**: Tema escuro profissional com cores cyan (#81ecff) e purple (#b085ff)
-
----
-
-## 📊 KPIs Implementados
-
-### Financeiros
-| KPI | Fórmula DAX | Finalidade |
-|-----|-------------|------------|
-| **Faturamento Total** | `SUM(Fato_Logistica[Valor Faturamento])` | Receita total |
-| **Custo Frete Total** | `SUM(Fato_Logistica[Custo de Frete])` | Despesa logística |
-| **Lucro Bruto** | `[Faturamento] - [Custo Frete]` | Margem absoluta |
-| **Margem %** | `DIVIDE([Lucro], [Faturamento])` | Rentabilidade |
-| **Custo Logístico %** | `DIVIDE([Custo Frete], [Faturamento])` | Peso do frete |
-
-### Operacionais
-| KPI | Fórmula DAX | Finalidade |
-|-----|-------------|------------|
-| **Volume Total** | `SUM(Fato_Logistica[Volume])` | Quantidade movimentada |
-| **KPI Rotas** | `DISTINCTCOUNTNOBLANK(Origem-Destino)` | Diversidade de rotas |
-| **Lead Time Médio** | `AVERAGEX(DATEDIFF())` | Tempo de entrega |
-| **Ocupação Frota** | `DIVIDE(Volume, Frota × Capacidade)` | Utilização de frota |
-| **Atrasos** | `COUNTROWS(FILTER())` | Pedidos fora do prazo |
-
----
-
-## 🏗️ Estrutura do Projeto
-
-```
-POWER BI/
-├── DASH LOGISTICA.pbix          # Arquivo principal do Power BI
-├── DASH LOGISTICA.pbip          # Projeto Power BI (formato .pbip)
-├── BASE LOGISTICA.csv           # Dados brutos (400+ linhas)
-├── DAX_LOGISTICS_GUIDE.md       # Guia de implementação DAX
-├── LOGISTICA/                   # Estrutura .pbip descompactada
-│   ├── Report/                  # Definições do relatório
-│   └── SemanticModel/           # Modelo de dados
-└── README.md                    # Este arquivo
-```
-
----
-
-## 📁 Dados
-
-### Fonte: `BASE LOGISTICA.csv`
-
-| Coluna | Tipo | Descrição |
-|--------|------|-----------|
-| `ID` | Int | Identificador único |
-| `Data` | Date | Data do frete |
-| `Transportadora` | Text | Nome da transportadora |
-| `Cliente` | Text | Nome do cliente |
-| `Estado_Origem` | Text | UF de origem |
-| `Estado_Destino` | Text | UF de destino |
-| `Volume` | Decimal | Quantidade de unidades |
-| `Valor Faturamento` | Currency | Valor da nota fiscal |
-| `Custo de Frete` | Currency | Custo do transporte |
-| `Mes` | Int | Mês (1-12) |
-| `Ano` | Int | Ano (2025) |
-
-**Volume de dados:** 400+ linhas, 8 transportadoras, 15+ clientes, todas as rotas interestaduais
-
----
-
-## 🔧 Configuração Técnica
-
-### 1. Importação dos Dados
-
-```powerquery
-// Power Query Editor
-Fonte = Csv.Document(
-    File.Contents("BASE LOGISTICA.csv"),
-    [Delimiter=";", Encoding=1252]
-)
-```
-
-**Transformações aplicadas:**
-- ✅ Delimitador: ponto-e-vírgula (;)
-- ✅ `Data`: Tipo Date usando locale PT-BR
-- ✅ `Volume`, `Valor`, `Custo`: Decimal Number
-- ✅ Tabela renomeada para `Fato_Logistica`
-
-### 2. Modelo de Dados
-
-```
-Fato_Logistica (Tabela Fato)
-├── Medidas DAX (12+ medidas)
-└── Colunas para relatórios
-
-Tabela Calendário (Dimensão Tempo) — Auto gerada
-├── Date
-├── Month
-├── Quarter
-└── Year
-```
-
-### 3. DAX — Medidas Principais
+## DAX
 
 ```dax
--- FINANCEIRAS
-Faturamento Total = SUM('Fato_Logistica'[Valor Faturamento])
+Faturamento YTD = TOTALYTD([Faturamento Total], 'BASE LOGISTICA'[Data])
 
-Custo Frete Total = SUM('Fato_Logistica'[Custo de Frete])
+Faturamento YoY % =
+    VAR fat_atual   = [Faturamento Total]
+    VAR fat_ano_ant = CALCULATE([Faturamento Total], SAMEPERIODLASTYEAR('BASE LOGISTICA'[Data]))
+    RETURN DIVIDE(fat_atual - fat_ano_ant, fat_ano_ant, 0)
 
-Lucro Bruto = [Faturamento Total] - [Custo Frete Total]
-
-Margem Percentual = 
-DIVIDE(
-    [Lucro Bruto], 
-    [Faturamento Total], 
-    0
-)
-
-Custo Logístico % = 
-DIVIDE(
-    [Custo Frete Total], 
-    [Faturamento Total], 
-    0
-)
-
--- OPERACIONAIS
-Volume Total = SUM('Fato_Logistica'[Volume])
-
-KPI Rotas = 
-DISTINCTCOUNTNOBLANK(
-    CONCATENATE(
-        'Fato_Logistica'[Estado_Origem], 
-        CONCATENATE("-", 'Fato_Logistica'[Estado_Destino])
-    )
-)
-
-Lead Time Médio = 
-AVERAGEX(
-    'Fato_Logistica',
-    DATEDIFF(
-        'Fato_Logistica'[Data], 
-        'Fato_Logistica'[Data] + ROUND(RAND() * 5 + 1, 0),
-        DAY
-    )
-)
-
-Ocupação Frota = 
-DIVIDE(
-    [Volume Total], 
-    DISTINCTCOUNT('Fato_Logistica'[Transportadora]) * 1000,
-    0
-)
+Ticket Médio          = DIVIDE([Faturamento Total], [Volume Total], 0)
+Faturamento por Viagem = DIVIDE([Faturamento Total], COUNTROWS('BASE LOGISTICA'), 0)
 ```
 
----
+`DIVIDE` with a zero fallback everywhere, so an empty filter shows 0 instead of an error. The step-by-step build (Power Query import, measures, visuals) is in [`DAX_LOGISTICS_GUIDE.md`](DAX_LOGISTICS_GUIDE.md).
 
-## 📊 Visualização Criada
+## Data
 
-### Dashboard Principal
+`BASE LOGISTICA.csv` has 200 synthetic shipments from 2025: date, carrier, customer, origin and destination state, volume, revenue and freight cost. Company names are fictitious.
 
-| Visual | Dataset | Finalidade |
-|--------|---------|------------|
-| **Mapa (Filled Map)** | Estado_Destino + Faturamento | Distribuição geográfica |
-| **Card KPI** | Faturamento Total | Receita em destaque |
-| **Card KPI** | Margem % | Rentabilidade |
-| **Card KPI** | Volume Total | Quantidade movida |
-| **Gráfico de Barras** | Transportadora × Custo | Ranking de custos |
-| **Gráfico de Linha** | Mês × Faturamento | Tendência temporal |
-| **Tabela** | Detalhe por rota | Drill-down operacional |
+## Repository layout
 
-### Tema de Cores
-
-```json
-{
-  "background": "#14161d",
-  "accent1": "#81ecff",
-  "accent2": "#b085ff",
-  "text": "#ffffff"
-}
+```
+LOGISTICA/                     current version of the report (PBIP)
+  DASH LOGISTICA.Report/       pages and visuals as JSON
+  DASH LOGISTICA.SemanticModel/ tables and DAX measures as TMDL
+DASH LOGISTICA.pbix            the same report as a single binary file
+DASH LOGISTICA.html            HTML prototype of the dashboard layout
+DAX_LOGISTICS_GUIDE.md         build guide
 ```
 
-**Como aplicar:** View > Switch Theme > Browse for themes > carregar arquivo `.json`
+Open `LOGISTICA/DASH LOGISTICA.pbip` in Power BI Desktop (PBIP support is enabled by default in current versions).
 
----
+## Why PBIP
 
-## 🚀 Como Usar
+A `.pbix` is a zip: git sees one binary blob and a code review shows nothing. PBIP stores the model as TMDL and the report as JSON, so a changed measure shows up as a one-line diff, and the report can be reviewed like code.
 
-### Opção 1: Abrir no Power BI Desktop
+## Limitations
 
-```bash
-# 1. Clone o repositório
-git clone https://github.com/silvano/powerbi-logistics-dax.git
+- One flat table plus Power BI's automatic date tables; there is no separate date or carrier dimension yet. A proper star schema is the next step.
+- Synthetic data, small on purpose. It covers 2025 only, so the YoY measure returns 0 until a second year is loaded.
 
-# 2. Abra no Power BI Desktop
-# Clique duplo em "DASH LOGISTICA.pbix"
+## Author
 
-# 3. Atualize os dados (se necessário)
-# Home > Refresh
-```
-
-### Opção 2: Recriar do Zero
-
-1. **Importe os dados:**
-   - Get Data > Text/CSV > selecione `BASE LOGISTICA.csv`
-   
-2. **Transforme no Power Query:**
-   - Delimitador: `;`
-   - Formato de data: PT-BR
-   - Feche e aplique
-
-3. **Crie as medidas DAX:**
-   - Copie as fórmulas do guia `DAX_LOGISTICS_GUIDE.md`
-
-4. **Monte o dashboard:**
-   - Siga o mapeamento de visuais acima
-
----
-
-## 📖 O Que Este Projeto Demonstra
-
-### Para Recruiters de Data Analytics:
-
-| Competência | Evidência no Projeto |
-|-------------|----------------------|
-| **ETL** | Power Query com transformação de CSV, tipagem, locale |
-| **Modelagem** | Star schema, tabelas fato/dimensão, relacionamentos |
-| **DAX** | 12+ medidas, DIVIDE, CALCULATE, Time Intelligence |
-| **Visualização** | Storytelling com dados, KPIs executivos |
-| **Dashboard Design** | Tema profissional, hierarquia visual |
-
----
-
-## 🎯 Casos de Uso Reais
-
-Este dashboard pode ser adaptado para:
-
-- **Logística**: Monitoramento de fretes, custos, prazos
-- **Comercial**: Faturamento por cliente, região, transportadora
-- **Financeiro**: Margem por rota, análise de rentabilidade
-- **Operacional:** Ocupação de frota, lead time, atrasos
-
----
-
-## 📸 Screenshots
-
-*(Adicionar screenshots do dashboard após publicação)*
-
-### Sugestão de Capturas:
-
-1. **Dashboard Completo** — Visão geral
-2. **Detalhe Mapa** — Distribuição geográfica
-3. **KPIs Financeiros** — Faturamento, margem, custos
-4. **Editor DAX** — Mostrando fórmulas complexas
-
----
-
-## 🔒 Segurança de Dados
-
-**Dados:** Este projeto usa dados **sintéticos** gerados para fins educacionais.
-
-- ✅ Nenhuma informação real de empresas
-- ✅ Nomes de clientes são fictícios
-- ✅ Valores e volumes são simulados
-- ✅ Pode ser compartilhado publicamente
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Áreas de interesse:
-
-- [ ] Novas medidas DAX (ex: YoY, MoM, forecasting)
-- [ ] Página adicional para análise de transportadoras
-- [ ] Integração com API de CEP para endereços completos
-- [ ] Deployment para Power BI Service
-
-Veja [CONTRIBUTING.md](CONTRIBUTING.md) para diretrizes.
-
----
-
-## 📚 Recursos Adicionais
-
-### Documentação Oficial
-- [DAX Guide](https://dax.guide/)
-- [Power BI Documentation](https://docs.microsoft.com/power-bi/)
-- [SQLBI — Mastering DAX](https://www.sqlbi.com/books/)
-
-### Projetos Relacionados
-- [CYBERFLUX](https://github.com/silvano/cyberflux-skills) — AI Skills
-- [visionnaire-cowork](https://github.com/silvano/visionnaire-cowork) — Video Automation
-
----
-
-## 📞 Contato
-
-**Silvano Moraes** — Solution Developer & Data Specialist
-
-- **GitHub:** github.com/silvano
-- **LinkedIn:** linkedin.com/in/silvano-moraes-de-souza
-- **Email:** silvano@antigravity.dev
-
----
-
-## 📄 Licença
-
-MIT License — livre para uso pessoal, comercial e educacional.
-
----
-
-<div align="center">
-
-**Desenvolvido com ❤️ por Silvano Moraes**
-
-[⬆ Topo](#-power-bi-logistics-dashboard--dax--data-modeling)
-
-</div>
+**Silvano Moraes de Souza**, Software Engineer · Python, APIs, automation and data in production
+[LinkedIn](https://www.linkedin.com/in/silvano-moraes-de-souza) · [Portfolio](https://silvanomsouza.vercel.app/) · [GitHub](https://github.com/silvano-moraes-de-souza)
