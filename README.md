@@ -37,7 +37,11 @@ Faturamento por Viagem = DIVIDE([Faturamento Total], COUNTROWS('BASE LOGISTICA')
 
 ## Data
 
-`BASE LOGISTICA.csv` has 200 synthetic shipments from 2025: date, carrier, customer, origin and destination state, volume, revenue and freight cost. Company names are fictitious.
+`BASE LOGISTICA.csv` has 200 synthetic shipments from 2025: date, carrier, customer, origin and destination state, volume, revenue and freight cost. Some carrier names are real Brazilian brands used as labels; every value is made up.
+
+![Revenue by carrier](docs/revenue_by_carrier.png)
+
+<sub>Generated from the CSV by <a href="scripts/chart_revenue_by_carrier.py">scripts/chart_revenue_by_carrier.py</a>, with the same aggregation as the carrier visual in the report. Freight cost sits at about 50% of revenue for every carrier because the synthetic data was generated that way; with real data this is the chart that would show which carriers erode margin.</sub>
 
 ## Repository layout
 
