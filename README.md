@@ -10,6 +10,10 @@
 
 > An executive logistics dashboard: freight revenue, cost, margin, volume and year-to-date figures by carrier, with a map of flows between states. The report is saved in the PBIP text format, so every measure and visual is readable and diffable in git.
 
+![HTML prototype filled from the CSV](docs/prototype.png)
+
+<sub>The HTML prototype of the layout (<code>DASH LOGISTICA.html</code>). Every number on it is computed from <code>BASE LOGISTICA.csv</code> by <a href="scripts/build_prototype.py">scripts/build_prototype.py</a>, so it agrees with the Power BI report; the first draft used placeholder values.</sub>
+
 ## What is on the dashboard
 
 | Visual | Content |
@@ -50,7 +54,8 @@ LOGISTICA/                     current version of the report (PBIP)
   DASH LOGISTICA.Report/       pages and visuals as JSON
   DASH LOGISTICA.SemanticModel/ tables and DAX measures as TMDL
 DASH LOGISTICA.pbix            the same report as a single binary file
-DASH LOGISTICA.html            HTML prototype of the dashboard layout
+DASH LOGISTICA.html            HTML prototype of the dashboard layout, numbers from the CSV
+scripts/                       prototype builder and chart, both computed from the CSV
 DAX_LOGISTICS_GUIDE.md         build guide
 ```
 
@@ -64,6 +69,8 @@ A `.pbix` is a zip: git sees one binary blob and a code review shows nothing. PB
 
 - One flat table plus Power BI's automatic date tables; there is no separate date or carrier dimension yet. A proper star schema is the next step.
 - Synthetic data, small on purpose. It covers 2025 only, so the YoY measure returns 0 until a second year is loaded.
+- The CSV has a data quality issue that the report does not catch: 11 shipments go to destination state `MD`, which is not a Brazilian state code. A validation step in Power Query (or upstream) should reject or map it.
+- The state shapes on the HTML prototype's map are schematic, not real borders.
 
 ## Author
 
